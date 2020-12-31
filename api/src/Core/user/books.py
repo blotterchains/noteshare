@@ -1,4 +1,5 @@
 from src.Core.utils import *
+from time import localtime
 def newBook(data,db):
     try:query=decodeToken(data['token'])
     except Exception as e:return 'wrong token'
@@ -52,9 +53,8 @@ def newBook(data,db):
     print(userInfo,query)
     return userInfo
 def updateBook(data,db):
-    # try:
-    query=decodeToken(data.pop('token'))
-    # except Exception as e:return 'wrong token'
+    try:query=decodeToken(data.pop('token'))
+    except Exception as e:return 'wrong token'
     col=db['users']
     userInfo=col.find_one(query)
     books=userInfo['books']
@@ -96,3 +96,31 @@ def getBookInfo(data,db):
     else:
         pass
     return (_ret)
+def insertComment(data,db):
+    if('text' and 'hash' and 'token' and 'username'):
+        try:senderUserInfo=decodeToken(data['token'])
+        except Exception as e:return str(e)
+        print(data)
+        col=db['users']
+        userInfo=col.find_one({'username':data['username']})
+        
+        books=userInfo['books']
+        for i in books:
+            if(i['hash']==data['hash']):
+                comments=i['comments']
+                currentDate="%s/%s/%s"%(localtime().tm_year,localtime().tm_mon,localtime().tm_mday)
+                i['comments'].append({
+                    'date':currentDate,
+                    'text':data['text'],
+                    'username':senderUserInfo['username']
+                })
+                break
+            else:
+                continue
+        userInfo['books']=books
+        col.update_one({'username':data['username']},{"$set":userInfo})
+        _ret=col.find_one({'username':data['username']})
+        _ret.pop('_id')
+        return _ret
+    else:
+        return 'wrong inputs'
