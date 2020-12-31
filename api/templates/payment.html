@@ -1,0 +1,32 @@
+
+شماره تراکنش:{{hash}}
+<br/>
+<script>
+    function sc(type){
+        fetch('http://localhost:500/api',
+            {
+                headers: {
+                    "Content-Type":"application/json",
+                    'action':'login-updateorder'
+                },
+                method: "POST",
+                mode: "cors",
+                body:JSON.stringify({
+                    "hash":{{hash}},
+                    "status":type
+                })
+            })
+        .then(response => response.json())
+        .then(response => response)
+    }
+</script>
+<input
+type='button'
+value='پرداخت موفق'
+onclick="sc(1)"
+/>
+<input
+type='button'
+onclick="sc(2)"
+value="پرداخت ناموفق"
+/>
