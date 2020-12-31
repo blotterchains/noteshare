@@ -1,5 +1,6 @@
 
 from src.Core.utils import  isIntType
+import pymongo
 def index(data,col):
     x=col.insert_one(data)
     return x.inserted_id
@@ -30,7 +31,7 @@ def find(data,col):
             "$or":[dd]
     }
     _ret=[]
-    for x in col.find(myquery).skip(page*limit).limit(limit):
+    for x in col.find(myquery).skip(page*limit).limit(limit).sort("_id",-1):
         x['_id']=str(x['_id'])
         try:
             if(x['price']!='free'):
