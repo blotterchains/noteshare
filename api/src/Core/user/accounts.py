@@ -1,5 +1,6 @@
 from hashlib import sha512
 from src.Core.utils import emailSender,GmailSender,objectIDtoStr,encodeToken,decodeToken,encodeBooks
+from hashlib import sha256
 def login(data,db):
     if('username' and 'password' in data):
         col=db['users']
@@ -24,7 +25,6 @@ def getUserInfo(data,db):
         _ret=col.find_one(query)
         if(_ret!=None):
             objectIDtoStr(_ret)
-            print(_ret)
             return _ret
         else:
             return 'expired token'
@@ -71,3 +71,47 @@ def compeleteSignUp(data,db):
             return({"usertoken":_ret})
         else:
             return 'hash is wrong'
+def buyNewBook(data,db):
+    if(data!=[]):
+        col=db['dispayments']
+        # print(data)
+        # return 'maintence'
+        orderId=sha256(bytes(str(data).encode('utf8'))).hexdigest()
+        col.insert_one({
+            "order_id":orderId,
+            'buys':data,
+            'status':0
+        })
+        return orderId
+    else:
+        return 'empty ordering'
+def updateOrdersBook(data,db):
+    if('status' and 'hash' in data):
+        bookToBuy=db['dispayments'].find_one({'order_id':data['hash']})
+        
+        if(bookToBuy!=None and data['status']==1):
+            _ret=[]
+            for i in bookToBuy['buys']:
+                userInfo=db['users'].find_one({"username":i['owner']['username']})
+                transactions=userInfo['trasaction']
+                transactions.append({
+                    "name":i['name'],
+                    "price":i['price'],
+                    "hash":i["hash"],
+                    "status":"unpaid"
+                })
+                
+                userInfo['transaction']=transactions
+                db['users'].update_one({"username":i['owner']['username']},{"$set":userInfo})
+                buyerInfo=db['users'].find_one({"username":bookToBuy['buyer']})
+                buyerTransaction=buyerInfo['trasaction']
+                buyerTransaction.append({
+                    "name":i['name'],
+                    "price":i['price'],
+                    "hash":i['hash']
+                })
+                buyerInfo['trasaction']=buyerTransaction
+                print(buyerInfo)
+                db['users'].update_one({"username":bookToBuy['buyer']},{"$set":buyerInfo})
+            return 'maintence'
+        
