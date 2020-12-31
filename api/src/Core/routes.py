@@ -9,6 +9,7 @@ from src.Core.user.accounts import getUserInfo
 from src.Core.user.books import newBook
 from src.Core.user.books import updateBook
 from src.Core.user.books import getBookInfo
+from src.Core.user.books import insertComment
 def dispacther():
 
     dispatch={
@@ -23,6 +24,7 @@ def dispacther():
         "signup-compelete":compeleteSignUp,
         "books-newbook":newBook,
         "books-updatebook":updateBook,
-        "books-info":getBookInfo
+        "books-info":getBookInfo,
+        "books-comment":insertComment
     }
     return dispatch
