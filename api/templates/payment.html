@@ -3,7 +3,8 @@
 <br/>
 <script>
     function sc(type){
-        fetch('http://localhost:500/api',
+        return(
+            fetch('http://localhost:5000/api',
             {
                 headers: {
                     "Content-Type":"application/json",
@@ -12,21 +13,31 @@
                 method: "POST",
                 mode: "cors",
                 body:JSON.stringify({
-                    "hash":{{hash}},
+                    "hash":"{{hash}}",
                     "status":type
                 })
             })
         .then(response => response.json())
-        .then(response => response)
+        .then(response => {
+            if(type===1){
+                window.open("http://localhost:3001/buy/1")
+            }else{
+                window.open("http://localhost:3001/buy/2")
+            }
+            })
+        
+        ) 
+        
+        
     }
 </script>
 <input
 type='button'
 value='پرداخت موفق'
-onclick="sc(1)"
+onClick="sc(1)"
 />
 <input
 type='button'
-onclick="sc(2)"
+onClick="sc(2)"
 value="پرداخت ناموفق"
 />
