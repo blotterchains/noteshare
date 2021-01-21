@@ -50,7 +50,6 @@ def newBook(data,db):
     col.update_one(query,newvalues)
     userInfo=col.find_one(query)
     objectIDtoStr(userInfo)
-    print(userInfo,query)
     return userInfo
 def updateBook(data,db):
     try:query=decodeToken(data.pop('token'))
@@ -69,7 +68,6 @@ def updateBook(data,db):
         else:
             cc+=1
             continue
-    print(data,"\n\n\n\n",books)
     userInfo['books']=books
     col.update_one(query,{"$set":userInfo})
     bookIntoBooks.pop('comments')

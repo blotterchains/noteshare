@@ -31,7 +31,12 @@ def isIntType(data):
         return False
 def objectIDtoStr(data):
     data['_id']=str(data['_id'])
-    
+    return data
+def deleteArraywith(data):
+    if('status' not in data):
+        return True
+    else:
+        return False
 def emailSender(msg,sub,to):
     data={"from": "wizif <mailgun@sandbox2d873de64b4546b8b375b7e1d0f9b33f.mailgun.org>",
 			"to": "{}".format(to),
