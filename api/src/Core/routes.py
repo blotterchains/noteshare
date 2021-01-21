@@ -8,10 +8,14 @@ from src.Core.user.accounts import compeleteSignUp
 from src.Core.user.accounts import getUserInfo
 from src.Core.user.accounts import buyNewBook
 from src.Core.user.accounts import updateOrdersBook
+from src.Core.user.accounts import cashout as ucashout
 from src.Core.user.books import newBook
 from src.Core.user.books import updateBook
 from src.Core.user.books import getBookInfo
 from src.Core.user.books import insertComment
+from src.Core.admin.admin import deleteBook
+from src.Core.admin.admin import allcashout
+from src.Core.admin.admin import payCashout
 def dispacther():
 
     dispatch={
@@ -25,6 +29,7 @@ def dispacther():
         "login-userinfo":getUserInfo,
         "login-order":buyNewBook,
         "login-updateorder":updateOrdersBook,
+        "login-cashout":ucashout,
         ###############################signup routes
         "signup":signup,
         "signup-compelete":compeleteSignUp,
@@ -32,6 +37,10 @@ def dispacther():
         "books-newbook":newBook,
         "books-updatebook":updateBook,
         "books-info":getBookInfo,
-        "books-comment":insertComment
+        "books-comment":insertComment,
+        ###############################admin routes
+        "admin-deleteBook":deleteBook,
+        "admin-paycashout":payCashout,
+        "admin-allcashout":allcashout
     }
     return dispatch
