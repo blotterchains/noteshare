@@ -1,4 +1,4 @@
-from flask import Flask,jsonify,request
+from flask import Flask,jsonify,request,render_template
 from flask_cors import CORS
 import src.Core.routes as routes
 import pymongo
@@ -63,9 +63,19 @@ def upload_file():
                     zz.write(b64decode(data['file']))
                     return jsonify({"url":'http://localhost:5000/'+filename+'.jpg'})
                 except Exception as e:return jsonify('wrong')
+            elif('data:audio/mpeg;base64,' in data['file']):
+                try:
+                    data['file']=data['file'].replace('data:audio/mpeg;base64,','')
+                    zz=open(filename+'.mp3','wb')
+                    zz.write(b64decode(data['file']))
+                    return jsonify({'url':'http://localhost:5000/'+filename+'.mp3'})
+                except :return jsonify('wrong')
             else:return jsonify('wrong type')
         except Exception as e:
             return str(e)
+@app.route('/dargah/<hash>')
+def dargah(hash):
+    return render_template('payment.html',hash=hash)
 app.run(debug=True)
 
         
