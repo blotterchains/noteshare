@@ -63,7 +63,7 @@ def compeleteSignUp(data,db):
                 'balance':0,
                 'profilepic':'',
                 'email':basicInfo['email'],
-                'trasaction':[]
+                'transaction':[]
             }
             col=db['users']
             x=col.insert_one(activeUser)
@@ -72,15 +72,28 @@ def compeleteSignUp(data,db):
         else:
             return 'hash is wrong'
 def buyNewBook(data,db):
-    if(data!=[]):
+    try:username=decodeToken(data['token'])
+    except Exception as e:return 'wrong token'
+    if(data):
         col=db['dispayments']
         # print(data)
         # return 'maintence'
+        buys=[]
+        for n in data['buys']:
+            books=db['users'].find_one({'username':n['owner']['username']})['books']
+            for i in books:
+                if(i['hash']==n['hash']):
+                    n['url']=i['url']
+                    continue
+            buys.append(n)
+        print(buys)
         orderId=sha256(bytes(str(data).encode('utf8'))).hexdigest()
         col.insert_one({
             "order_id":orderId,
-            'buys':data,
-            'status':0
+            'buys':buys,
+            'status':0,
+            "buyer":username['username'],
+            
         })
         return orderId
     else:
@@ -93,25 +106,38 @@ def updateOrdersBook(data,db):
             _ret=[]
             for i in bookToBuy['buys']:
                 userInfo=db['users'].find_one({"username":i['owner']['username']})
-                transactions=userInfo['trasaction']
+                transactions=userInfo['transaction']
                 transactions.append({
                     "name":i['name'],
                     "price":i['price'],
                     "hash":i["hash"],
-                    "status":"unpaid"
+                    "status":"unpaid",
+                    "pic":i['pic'],
+                    "url":i['url']
                 })
                 
                 userInfo['transaction']=transactions
                 db['users'].update_one({"username":i['owner']['username']},{"$set":userInfo})
                 buyerInfo=db['users'].find_one({"username":bookToBuy['buyer']})
-                buyerTransaction=buyerInfo['trasaction']
+                buyerTransaction=buyerInfo['transaction']
                 buyerTransaction.append({
                     "name":i['name'],
                     "price":i['price'],
-                    "hash":i['hash']
+                    "hash":i['hash'],
+                    "pic":i['pic'],
+                    "url":i['url']
                 })
-                buyerInfo['trasaction']=buyerTransaction
+                buyerInfo['transaction']=buyerTransaction
                 print(buyerInfo)
                 db['users'].update_one({"username":bookToBuy['buyer']},{"$set":buyerInfo})
             return 'maintence'
+def cashout(data,db):
+    try:username=decodeToken(data['token'])
+    except Exception as e:return 'wrong token'
+    userInfo=db['users'].find_one(username)
+    if(userInfo):
+        userInfo.update({'cashout':True})
+        print(userInfo)
+        db['users'].update_one({"username":username['username']},{"$set":userInfo})
+        return objectIDtoStr(db['users'].find_one({"username":username['username']}))
         
